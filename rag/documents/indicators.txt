@@ -1,0 +1,3 @@
+RSI measures momentum and identifies overbought or oversold conditions.
+MACD shows trend direction and momentum.
+Moving averages smooth price data to identify trends.
