@@ -20,7 +20,5 @@ st.write(f"Confidence: {confidence}%")
  
 if st.button("Explain Prediction"):
     chain = get_rag_chain()
-    explanation = chain.run(
-        "Explain the stock trend using technical indicators"
-    )
-    st.info(explanation)
+    result = chain.invoke({"input": "Explain the stock trend using technical indicators"})
+    st.info(result["answer"])

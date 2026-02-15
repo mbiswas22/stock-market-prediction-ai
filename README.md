@@ -1,5 +1,9 @@
 ## Stock Trend Predictor (Educational Project)
 
+### Requirements
+
+- Python 3.12 or later
+
 ### Features
 
 - ML-based trend prediction
@@ -21,6 +25,7 @@ python rag/build_vectorstore.py
 streamlit run app/streamlit_app.py
 ⚠️ Not financial advice.
 ```
+
 ### UI Screenshot
 
 <img width="2554" height="1201" alt="image" src="https://github.com/user-attachments/assets/923d57a2-34eb-4aa8-a311-4d18cba5631e" />

@@ -12,4 +12,4 @@ embeddings = HuggingFaceEmbeddings(
 vectorstore = FAISS.from_documents(docs, embeddings)
 vectorstore.save_local("rag/vectorstore")
 
-print("✅ Vector store built successfully")
+print("Vector store built successfully")

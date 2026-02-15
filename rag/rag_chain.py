@@ -1,7 +1,6 @@
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.llms import HuggingFacePipeline
-from langchain.chains import RetrievalQA
  
 def get_rag_chain():
     embeddings = HuggingFaceEmbeddings(
@@ -13,8 +12,19 @@ def get_rag_chain():
         task="text-generation",
         pipeline_kwargs={"max_new_tokens": 50}
     )
- 
-    return RetrievalQA.from_chain_type(
-        llm=llm,
-        retriever=db.as_retriever()
-    )
+    
+    retriever = db.as_retriever()
+    
+    def invoke(query_dict):
+        query = query_dict.get("input", "")
+        docs = retriever.invoke(query)
+        context = "\n".join([doc.page_content for doc in docs])
+        prompt = f"{context}\n\nQuestion: {query}\nAnswer:"
+        answer = llm.invoke(prompt)
+        return {"answer": answer}
+    
+    class SimpleChain:
+        def invoke(self, query_dict):
+            return invoke(query_dict)
+    
+    return SimpleChain()
