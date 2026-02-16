@@ -8,6 +8,7 @@
 
 - ML-based trend prediction
 - Explainable AI using RAG
+- Interactive chatbot with stock analysis tools
 - Streamlit UI
 - Free-tier friendly
 
