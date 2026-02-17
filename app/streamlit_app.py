@@ -129,8 +129,8 @@ with col_news:
         st.warning("⚠️ FINNHUB_API_KEY not found in .env file. Intelligence features disabled.")
         st.info("Get a free API key at https://finnhub.io/ and add it to your .env file.")
     
-    # Run Intelligence button
-    if st.button("🧠 Run Intelligence", type="primary", disabled=not api_key_exists):
+    # UPDATED SECTION - Button renamed from "Run Intelligence" to "Generate Insights"
+    if st.button("🧠 Generate Insights", type="primary", disabled=not api_key_exists):
         with st.spinner("Running AI agents..."):
             # Prepare indicators dict
             indicators = {
@@ -160,84 +160,71 @@ with col_news:
         report = st.session_state["intelligence_report"]
         
         with st.container(border=True):
-            # Event Risk Badge
-            st.subheader("🚨 Event Risk")
+            # UPDATED SECTION - All sections converted to collapsible expanders
             
-            risk_level = report.earnings.event_risk_level
-            risk_colors = {"LOW": "green", "MEDIUM": "orange", "HIGH": "red"}
-            
-            st.markdown(f"**Level:** :{risk_colors.get(risk_level, 'gray')}[{risk_level}]")
-            st.caption(report.earnings.event_risk_reason)
-            
-            if report.earnings.earnings_date:
-                st.caption(f"Earnings Date: {report.earnings.earnings_date}")
-            
-            st.divider()
-            
-            # Sentiment Badge
-            st.subheader("📊 Sentiment Analysis")
-            
-            sentiment = report.sentiment.overall_sentiment
-            sentiment_colors = {"Positive": "green", "Neutral": "gray", "Negative": "red"}
-            
-            st.markdown(f"**Sentiment:** :{sentiment_colors.get(sentiment, 'gray')}[{sentiment}]")
-            st.caption(f"Score: {report.sentiment.sentiment_score:.2f}")
-            
-            st.divider()
-            
-            # Supportive Context (NEW)
-            st.subheader("✅ Supportive Context")
-            st.caption("Factors that may strengthen confidence in the model prediction")
-            for item in report.sentiment.supportive_context:
-                st.markdown(f"- {item}")
-            
-            st.divider()
-            
-            # Risk Factors (NEW)
-            st.subheader("⚠️ Risk Factors")
-            st.caption("Conditions that may reduce confidence or introduce uncertainty")
-            for item in report.sentiment.risk_factors:
-                st.markdown(f"- {item}")
-            
-            st.divider()
-            
-            # Confidence Impact Summary (NEW)
-            st.subheader("📊 Confidence Impact Summary")
-            st.info(report.sentiment.confidence_summary)
-            
-            st.divider()
-            
-            # Top 3 Headlines
-            st.subheader("📰 Top Headlines")
-            
-            if report.news.top_headlines:
-                # Create dataframe for display
-                headlines_data = []
-                for h in report.news.top_headlines:
-                    headlines_data.append({
-                        "Datetime": h.datetime,
-                        "Source": h.source,
-                        "Tag": h.reason_tag.upper(),
-                        "Headline": h.headline[:60] + "...",
-                        "Link": f"[Open]({h.url})" if h.url else ""
-                    })
+            # Event Risk (AUTO-EXPANDED)
+            with st.expander("🚨 Event Risk", expanded=True):
+                risk_level = report.earnings.event_risk_level
+                risk_colors = {"LOW": "green", "MEDIUM": "orange", "HIGH": "red"}
                 
-                df_headlines = pd.DataFrame(headlines_data)
-                st.dataframe(df_headlines, use_container_width=True, hide_index=True)
+                st.markdown(f"**Level:** :{risk_colors.get(risk_level, 'gray')}[{risk_level}]")
+                st.caption(report.earnings.event_risk_reason)
                 
-                # Fallback: clickable links
-                st.markdown("**Full Headlines:**")
-                for h in report.news.top_headlines:
-                    st.markdown(f"- [{h.source}] {h.headline} [Open]({h.url})")
+                if report.earnings.earnings_date:
+                    st.caption(f"Earnings Date: {report.earnings.earnings_date}")
+            
+            # Sentiment Analysis (COLLAPSED)
+            with st.expander("📊 Sentiment Analysis", expanded=False):
+                sentiment = report.sentiment.overall_sentiment
+                sentiment_colors = {"Positive": "green", "Neutral": "gray", "Negative": "red"}
                 
-                st.caption(f"Total headlines analyzed: {report.news.headline_count}")
-            else:
-                st.info("No recent headlines found.")
+                st.markdown(f"**Sentiment:** :{sentiment_colors.get(sentiment, 'gray')}[{sentiment}]")
+                st.caption(f"Score: {report.sentiment.sentiment_score:.2f}")
             
-            st.divider()
+            # Supportive Context (COLLAPSED)
+            with st.expander("✅ Supportive Context", expanded=False):
+                st.caption("Factors that may strengthen confidence in the model prediction")
+                for item in report.sentiment.supportive_context:
+                    st.markdown(f"- {item}")
             
-            # Legacy Explanation (kept for reference)
-            with st.expander("📖 Detailed Technical Analysis"):
+            # Risk Factors (COLLAPSED)
+            with st.expander("⚠️ Risk Factors", expanded=False):
+                st.caption("Conditions that may reduce confidence or introduce uncertainty")
+                for item in report.sentiment.risk_factors:
+                    st.markdown(f"- {item}")
+            
+            # Confidence Impact Summary (AUTO-EXPANDED)
+            with st.expander("📊 Confidence Impact Summary", expanded=True):
+                st.info(report.sentiment.confidence_summary)
+            
+            # Top Headlines (COLLAPSED)
+            with st.expander("📰 Top Headlines", expanded=False):
+                if report.news.top_headlines:
+                    # Create dataframe for display
+                    headlines_data = []
+                    for h in report.news.top_headlines:
+                        headlines_data.append({
+                            "Datetime": h.datetime,
+                            "Source": h.source,
+                            "Tag": h.reason_tag.upper(),
+                            "Headline": h.headline[:60] + "...",
+                            "Link": f"[Open]({h.url})" if h.url else ""
+                        })
+                    
+                    df_headlines = pd.DataFrame(headlines_data)
+                    st.dataframe(df_headlines, use_container_width=True, hide_index=True)
+                    
+                    # Fallback: clickable links
+                    st.markdown("**Full Headlines:**")
+                    for h in report.news.top_headlines:
+                        st.markdown(f"- [{h.source}] {h.headline} [Open]({h.url})")
+                    
+                    st.caption(f"Total headlines analyzed: {report.news.headline_count}")
+                else:
+                    st.info("No recent headlines found.")
+            
+            # Detailed Technical Analysis (COLLAPSED)
+            with st.expander("📖 Detailed Technical Analysis", expanded=False):
                 st.markdown(report.sentiment.explanation_markdown)
 
 st.divider()
