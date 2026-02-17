@@ -14,6 +14,7 @@
   - Sentiment + Indicator Explanation Agent
 - Two-column Streamlit UI (Prediction | News & Sentiment)
 - Explainable AI using RAG
+- Interactive chatbot with stock analysis tools
 - Free-tier friendly with smart caching
 
 ### Run Instructions
@@ -46,7 +47,6 @@ streamlit run app/streamlit_app.py
 
 <img width="2554" height="1201" alt="image" src="https://github.com/user-attachments/assets/923d57a2-34eb-4aa8-a311-4d18cba5631e" />
 
-
 ### Project Structure
 
 ```
@@ -78,6 +78,7 @@ stock-market-prediction-ai/
 ### Architecture
 
 **Left Window - Prediction & Technicals:**
+
 - Model prediction (UP/DOWN)
 - Confidence score
 - Technical indicators: MA20, MA50, Return, Volume, RSI, MACD
@@ -85,6 +86,7 @@ stock-market-prediction-ai/
 - Optional price chart
 
 **Right Window - News & Sentiment Intelligence:**
+
 - Event Risk Level (LOW/MEDIUM/HIGH)
 - Sentiment Analysis (Positive/Neutral/Negative)
 - Top 3 headlines with clickable links
@@ -101,12 +103,14 @@ stock-market-prediction-ai/
 ### Agent System Details
 
 **Agent 1 - News Ingestion:**
+
 - Fetches last 7 days of company news
 - Tags by reason: earnings, product, analyst, macro, regulatory
 - Deduplicates similar headlines
 - Returns top 3 most relevant
 
 **Agent 2 - Earnings & Event Awareness:**
+
 - Checks earnings calendar (±30 days)
 - Risk levels based on proximity:
   - HIGH: ±3 days from earnings
@@ -114,6 +118,7 @@ stock-market-prediction-ai/
   - LOW: Otherwise
 
 **Agent 3 - Sentiment + Indicator Explanation:**
+
 - Rule-based sentiment scoring
 - Generates markdown explanation
 - Inline citations from top headlines
