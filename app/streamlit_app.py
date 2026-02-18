@@ -1,6 +1,6 @@
 """
 Stock Trend Predictor with AI Intelligence System
-Two-column UI: Prediction + Technicals | News & Sentiment Intelligence
+Four-tab UI: Dashboard | Volatility Analysis | Prediction | Chatbot
 """
 import streamlit as st
 import pandas as pd
@@ -33,21 +33,81 @@ def run_intelligence_cached(ticker, prediction, indicators, confidence):
 
 st.title("📈 Stock Trend Predictor + AI Analyst")
 
-# # Sidebar for navigation
-# page = st.sidebar.radio("Navigation", ["Prediction", "Volatility Analysis", "Chatbot"])
-
 # Create Tabs
-tab1, tab2, tab3 = st.tabs([
-    "📊 Volatility Analysis",
+tab1, tab2, tab3, tab4 = st.tabs([
+    "📊 Dashboard",
+    "📈 Volatility Analysis",
     "📋 Prediction",
     "🤖 Chatbot"
 ])
 
 # ============================================================================
+# DASHBOARD PAGE
+# ============================================================================
+with tab1:
+    st.header("📊 Stock Market Dashboard")
+    
+    # Ticker selection
+    dash_ticker = st.selectbox("🎯 Select Stock for Dashboard", ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"], key="dash_ticker")
+    
+    # Load data
+    try:
+        dash_df = pd.read_csv(f"data/{dash_ticker}_features.csv")
+        
+        # Display key metrics
+        st.subheader(f"{dash_ticker} Key Metrics")
+        latest_dash = dash_df.tail(1)
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Current Price", f"${latest_dash['Close'].values[0]:.2f}")
+        with col2:
+            st.metric("MA20", f"${latest_dash['MA20'].values[0]:.2f}")
+        with col3:
+            st.metric("MA50", f"${latest_dash['MA50'].values[0]:.2f}")
+        with col4:
+            if "RSI" in dash_df.columns:
+                st.metric("RSI", f"{latest_dash['RSI'].values[0]:.2f}")
+        
+        st.divider()
+        
+        # Charts in 2 columns
+        col_left, col_right = st.columns(2)
+        
+        with col_left:
+            st.subheader("📈 Price & Moving Averages")
+            price_data = dash_df[["Close", "MA20", "MA50"]].tail(180)
+            st.line_chart(price_data)
+            
+            st.subheader("📊 Volume Trend")
+            volume_data = dash_df[["Volume"]].tail(180)
+            st.bar_chart(volume_data)
+        
+        with col_right:
+            if "RSI" in dash_df.columns:
+                st.subheader("📉 RSI Indicator")
+                rsi_data = dash_df[["RSI"]].tail(180)
+                st.line_chart(rsi_data)
+            
+            if "MACD" in dash_df.columns:
+                st.subheader("🔄 MACD")
+                macd_data = dash_df[["MACD", "MACD_Signal"]].tail(180)
+                st.line_chart(macd_data)
+        
+        st.divider()
+        
+        # Returns distribution
+        st.subheader("📊 Returns Distribution")
+        returns_data = dash_df[["Return"]].tail(180)
+        st.area_chart(returns_data)
+        
+    except FileNotFoundError:
+        st.error(f"❌ {dash_ticker}_features.csv not found. Please run fetch_data.py and feature_engineering.py first.")
+
+# ============================================================================
 # VOLATILITY ANALYSIS PAGE
 # ============================================================================
-# ------------------ TAB 1 ------------------
-with tab1:
+with tab2:
     st.header("📊 Realized Volatility Analysis")
     st.write("Quantitative equity analysis: 30/60/90 day rolling realized volatility trends")
     
@@ -63,8 +123,10 @@ with tab1:
                 st.error(f"❌ Error analyzing {ticker_input}: {str(e)}")
                 st.info("Please verify the ticker symbol and try again.")
 
-# ------------------ TAB 2 ------------------
-with tab2:
+# ============================================================================
+# PREDICTION PAGE
+# ============================================================================
+with tab3:
     st.subheader("Prediction Result")
 
     # Ticker selection
@@ -97,9 +159,7 @@ with tab2:
     # Create two columns
     col_pred, col_news = st.columns([1, 1])
 
-    # ============================================================================
     # LEFT WINDOW - Prediction & Technicals
-    # ============================================================================
     with col_pred:
         st.header("📈 Prediction & Technicals")
         
@@ -136,9 +196,9 @@ with tab2:
         if "RSI" in df.columns:
             rsi = latest["RSI"].values[0]
             if rsi > 70:
-                rsi_indicator = "🐂"  # Bull
+                rsi_indicator = "🐂"
             elif rsi <= 30:
-                rsi_indicator = "🐻"  # Bear
+                rsi_indicator = "🐻"
             else:
                 rsi_indicator = "—"
             
@@ -154,9 +214,7 @@ with tab2:
             chart_data = df[["Close", "MA20", "MA50"]].tail(100)
             st.line_chart(chart_data)
 
-    # ============================================================================
     # RIGHT WINDOW - News & Sentiment Intelligence
-    # ============================================================================
     with col_news:
         st.header("📰 News & Sentiment Intelligence")
         
@@ -167,7 +225,6 @@ with tab2:
             st.warning("⚠️ FINNHUB_API_KEY not found in .env file. Intelligence features disabled.")
             st.info("Get a free API key at https://finnhub.io/ and add it to your .env file.")
         
-        # UPDATED SECTION - Button renamed from "Run Intelligence" to "Generate Insights"
         if st.button("🧠 Generate Insights", type="primary", disabled=not api_key_exists):
             with st.spinner("Running AI agents..."):
                 # Prepare indicators dict
@@ -198,8 +255,6 @@ with tab2:
             report = st.session_state["intelligence_report"]
             
             with st.container(border=True):
-                # UPDATED SECTION - All sections converted to collapsible expanders
-                
                 # Event Risk (AUTO-EXPANDED)
                 with st.expander("🚨 Event Risk", expanded=True):
                     risk_level = report.earnings.event_risk_level
@@ -268,8 +323,10 @@ with tab2:
         st.divider()
         st.caption("⚠️ Not financial advice. For educational purposes only.")
 
-# ------------------ TAB 3 ------------------
-with tab3:
+# ============================================================================
+# CHATBOT PAGE
+# ============================================================================
+with tab4:
     st.header("🤖 AI Stock Analysis Chatbot")
     st.write("Powered by Finnhub API - Get real-time news, earnings, and sentiment analysis!")
     

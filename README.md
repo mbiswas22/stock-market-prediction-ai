@@ -22,7 +22,7 @@
   - 📊 Sentiment analysis
   - 📈 Historical price data
   - 📧 Email stock reports (SendGrid)
-- Three-tab Streamlit UI (Volatility Analysis | Prediction | Chatbot)
+- Four-tab Streamlit UI (Dashboard | Volatility Analysis | Prediction | Chatbot)
 - Explainable AI using RAG
 - Free-tier friendly with smart caching
 
@@ -70,9 +70,9 @@ stock-market-prediction-ai/
 ├── schemas/                     # Pydantic data models
 │   └── agent_schemas.py
 ├── app/
-│   ├── streamlit_app.py        # Two-page UI (Prediction | Chatbot)
-│   └── chatbot.py               # AI chatbot with 6 agent tools
-│   └── streamlit_app.py        # Three-page UI (Prediction | Volatility | Chatbot)
+│   ├── streamlit_app.py        # Four-tab UI (Dashboard | Volatility | Prediction | Chatbot)
+│   ├── chatbot.py               # AI chatbot with 7 agent tools
+│   └── market_summary.py        # Live market data widget
 ├── utils/
 │   ├── volatility_analyzer.py  # Realized volatility calculations
 │   └── tools.py
@@ -94,6 +94,28 @@ stock-market-prediction-ai/
 
 ### Architecture
 
+**Dashboard Page - Visual Analytics:**
+
+- Ticker dropdown selector (AAPL, MSFT, TSLA, GOOGL, AMZN)
+- Key metrics display: Current Price, MA20, MA50, RSI
+- 📈 Price & Moving Averages chart (180-day history)
+- 📊 Volume Trend bar chart
+- 📉 RSI Indicator line chart
+- 🔄 MACD line chart with signal line
+- 📊 Returns Distribution area chart
+- Dynamic data loading from ticker-specific CSV files
+
+**Volatility Analysis Page:**
+
+- 📊 30/60/90 day rolling realized volatility calculations
+- 📈 Time-series visualization of volatility trends
+- 🔍 Volatility trend interpretation (rising/falling)
+- 📉 Market regime assessment (expansion/compression/stable)
+- 🧮 Quantitative reasoning with percentile rankings
+- 💡 Probabilistic options-style insights
+- 📅 12-month historical analysis using free data (yfinance)
+- ⚡ Annualized volatility metrics (√252 scaling)
+
 **Prediction Page - Stock Trend Analysis:**
 
 - Ticker dropdown selector (AAPL, MSFT, TSLA, GOOGL, AMZN)
@@ -105,7 +127,12 @@ stock-market-prediction-ai/
 - Optional price chart
 - AI-powered insights with Finnhub integration
 
-**Chatbot Page - Interactive AI Assistant:**
+**Right Window - News & Sentiment Intelligence:**
+
+- Event Risk Level (LOW/MEDIUM/HIGH)
+- Sentiment Analysis (Positive/Neutral/Negative)
+- Top 3 headlines with clickable links
+- AI-generated explanation with citations
 
 - 💬 Natural language query processing
 - 🤖 7 specialized agent tools:
@@ -121,23 +148,7 @@ stock-market-prediction-ai/
 - 💾 Chat history with session state
 - 🎯 Smart ticker extraction from natural language
 
-**Right Window - News & Sentiment Intelligence:**
-
-- Event Risk Level (LOW/MEDIUM/HIGH)
-- Sentiment Analysis (Positive/Neutral/Negative)
-- Top 3 headlines with clickable links
-- AI-generated explanation with citations
-
-**Volatility Analysis Page:**
-
-- 📊 30/60/90 day rolling realized volatility calculations
-- 📈 Time-series visualization of volatility trends
-- 🔍 Volatility trend interpretation (rising/falling)
-- 📉 Market regime assessment (expansion/compression/stable)
-- 🧮 Quantitative reasoning with percentile rankings
-- 💡 Probabilistic options-style insights
-- 📅 12-month historical analysis using free data (yfinance)
-- ⚡ Annualized volatility metrics (√252 scaling)
+**Chatbot Page - Interactive AI Assistant:**
 
 ### Performance Optimizations
 
