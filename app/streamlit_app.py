@@ -33,10 +33,39 @@ def run_intelligence_cached(ticker, prediction, indicators, confidence):
 
 st.title("📈 Stock Trend Predictor + AI Analyst")
 
-# Sidebar for navigation
-page = st.sidebar.radio("Navigation", ["Prediction", "Volatility Analysis", "Chatbot"])
+# # Sidebar for navigation
+# page = st.sidebar.radio("Navigation", ["Prediction", "Volatility Analysis", "Chatbot"])
 
-if page == "Prediction":
+# Create Tabs
+tab1, tab2, tab3 = st.tabs([
+    "📊 Volatility Analysis",
+    "📋 Prediction",
+    "🤖 Chatbot"
+])
+
+# ============================================================================
+# VOLATILITY ANALYSIS PAGE
+# ============================================================================
+# ------------------ TAB 1 ------------------
+with tab1:
+    st.header("📊 Realized Volatility Analysis")
+    st.write("Quantitative equity analysis: 30/60/90 day rolling realized volatility trends")
+    
+    ticker_input = st.text_input("Enter Stock Symbol", value="AAPL").upper()
+    
+    if st.button("🔍 Analyze Volatility", type="primary"):
+        with st.spinner(f"Analyzing {ticker_input} volatility patterns..."):
+            try:
+                fig, report = analyze_stock_volatility(ticker_input)
+                st.pyplot(fig)
+                st.markdown(report)
+            except Exception as e:
+                st.error(f"❌ Error analyzing {ticker_input}: {str(e)}")
+                st.info("Please verify the ticker symbol and try again.")
+
+# ------------------ TAB 2 ------------------
+with tab2:
+    st.subheader("Prediction Result")
 
     # Ticker selection
     ticker = st.selectbox("Select Stock", ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"])
@@ -238,8 +267,9 @@ if page == "Prediction":
 
         st.divider()
         st.caption("⚠️ Not financial advice. For educational purposes only.")
-#Chat Bot
-elif page == "Chatbot":
+
+# ------------------ TAB 3 ------------------
+with tab3:
     st.header("🤖 AI Stock Analysis Chatbot")
     st.write("Powered by Finnhub API - Get real-time news, earnings, and sentiment analysis!")
     
@@ -337,24 +367,6 @@ elif page == "Chatbot":
         st.session_state.messages = []
         st.rerun()
 
-# ============================================================================
-# VOLATILITY ANALYSIS PAGE
-# ============================================================================
-elif page == "Volatility Analysis":
-    st.header("📊 Realized Volatility Analysis")
-    st.write("Quantitative equity analysis: 30/60/90 day rolling realized volatility trends")
-    
-    ticker_input = st.text_input("Enter Stock Symbol", value="AAPL").upper()
-    
-    if st.button("🔍 Analyze Volatility", type="primary"):
-        with st.spinner(f"Analyzing {ticker_input} volatility patterns..."):
-            try:
-                fig, report = analyze_stock_volatility(ticker_input)
-                st.pyplot(fig)
-                st.markdown(report)
-            except Exception as e:
-                st.error(f"❌ Error analyzing {ticker_input}: {str(e)}")
-                st.info("Please verify the ticker symbol and try again.")
 # Sidebar with market summary
 with st.sidebar:
     st.header("📊 Market Overview")
