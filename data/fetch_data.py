@@ -6,5 +6,9 @@ def fetch_stock_data(ticker="AAPL", period="5y"):
     return df
  
 if __name__ == "__main__":
-    df = fetch_stock_data()
-    df.to_csv("data/raw_stock_data.csv")
+    tickers = ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"]
+    for ticker in tickers:
+        print(f"Fetching {ticker}...")
+        df = fetch_stock_data(ticker)
+        df.to_csv(f"data/{ticker}_raw.csv")
+        print(f"✅ {ticker} data saved")

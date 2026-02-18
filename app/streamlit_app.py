@@ -70,11 +70,11 @@ with tab2:
     # Ticker selection
     ticker = st.selectbox("Select Stock", ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"])
 
-    # Load features data
+    # Load features data for selected ticker
     try:
-        df = pd.read_csv("data/features.csv")
+        df = pd.read_csv(f"data/{ticker}_features.csv")
     except FileNotFoundError:
-        st.error("❌ features.csv not found. Please run feature_engineering.py first.")
+        st.error(f"❌ {ticker}_features.csv not found. Please run fetch_data.py and feature_engineering.py first.")
         st.stop()
 
     # Get latest row

@@ -8,20 +8,21 @@
 ### Features
 
 - ML-based trend prediction with RSI & MACD indicators
+- **Multi-Ticker Support** - Separate data files for AAPL, MSFT, TSLA, GOOGL, AMZN with dynamic loading
 - **Realized Volatility Analysis** - 30/60/90 day rolling volatility trends with quantitative insights
 - 3-Agent Intelligence System:
   - News Ingestion Agent
   - Earnings & Event Awareness Agent
   - Sentiment + Indicator Explanation Agent
-- Two-column Streamlit UI (Prediction | News & Sentiment)
-- **Interactive AI Chatbot** with 6 agent tools:
+- **Interactive AI Chatbot** with 7 agent tools:
   - 💰 Real-time stock prices
   - 🏢 Company information
   - 📰 Latest news from Finnhub
   - 📅 Earnings calendar
   - 📊 Sentiment analysis
   - 📈 Historical price data
-- Three-page Streamlit UI (Prediction | Volatility Analysis | Chatbot)
+  - 📧 Email stock reports (SendGrid)
+- Three-tab Streamlit UI (Volatility Analysis | Prediction | Chatbot)
 - Explainable AI using RAG
 - Free-tier friendly with smart caching
 
@@ -35,11 +36,11 @@ python -m venv .venv
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Setup Finnhub API key
-copy .env.example .env
+# 3. Setup API keys
 # Edit .env and add your FINNHUB_API_KEY
+# Optional: Add SENDGRID_API_KEY and EMAIL_USER for email reports
 
-# 4. Fetch and prepare data
+# 4. Fetch and prepare data (creates separate files for each ticker)
 python data/fetch_data.py
 python data/feature_engineering.py
 python model/train_model.py
@@ -76,8 +77,11 @@ stock-market-prediction-ai/
 │   ├── volatility_analyzer.py  # Realized volatility calculations
 │   └── tools.py
 ├── data/
-│   ├── fetch_data.py
-│   └── feature_engineering.py  # Includes RSI & MACD
+│   ├── fetch_data.py            # Fetches data for all 5 tickers
+│   ├── feature_engineering.py   # Includes RSI & MACD
+│   ├── AAPL_raw.csv             # Raw data per ticker
+│   ├── AAPL_features.csv        # Processed features per ticker
+│   └── ... (MSFT, TSLA, GOOGL, AMZN)
 ├── model/
 │   ├── train_model.py          # Handles 4-7 features
 │   ├── predict.py
@@ -85,13 +89,15 @@ stock-market-prediction-ai/
 ├── rag/
 │   ├── build_vectorstore.py
 │   └── rag_chain.py
-└── .env                         # API keys (create from .env.example)
+└── .env                         # API keys (FINNHUB_API_KEY, SENDGRID_API_KEY, EMAIL_USER)
 ```
 
 ### Architecture
 
 **Prediction Page - Stock Trend Analysis:**
 
+- Ticker dropdown selector (AAPL, MSFT, TSLA, GOOGL, AMZN)
+- Dynamic data loading from ticker-specific CSV files
 - Model prediction (UP/DOWN)
 - Confidence score
 - Technical indicators: MA20, MA50, Return, Volume, RSI, MACD
@@ -102,13 +108,14 @@ stock-market-prediction-ai/
 **Chatbot Page - Interactive AI Assistant:**
 
 - 💬 Natural language query processing
-- 🤖 6 specialized agent tools:
+- 🤖 7 specialized agent tools:
   - **Price Tool**: Real-time quotes with change %
   - **Info Tool**: Company profile and market cap
   - **News Tool**: Latest headlines from Finnhub API
   - **Earnings Tool**: Earnings calendar and EPS data
   - **Sentiment Tool**: AI-powered news sentiment analysis
   - **History Tool**: 30-day price statistics
+  - **Email Tool**: Send comprehensive stock reports via SendGrid
 - ⚡ Quick action buttons for common queries
 - 📝 Example queries and help
 - 💾 Chat history with session state
@@ -201,3 +208,28 @@ stock-market-prediction-ai/
 - 30-day price statistics using yfinance
 - Shows high, low, and average prices
 - Triggers on: "history", "past", "trend", "stats"
+
+**Tool 7 - Email Agent:**
+
+- Generates comprehensive stock summary reports
+- Sends via SendGrid API (requires verified sender email)
+- Includes price, company info, history, sentiment, news, and earnings
+- Triggers on: "email", "send", "mail"
+- Falls back to report preview if SendGrid not configured
+
+### Data Management
+
+**Multi-Ticker Architecture:**
+
+- Each ticker has separate raw and features CSV files
+- `fetch_data.py` downloads 5 years of data for all tickers
+- `feature_engineering.py` processes each ticker independently
+- Streamlit app dynamically loads data based on dropdown selection
+- Supported tickers: AAPL, MSFT, TSLA, GOOGL, AMZN
+
+**Email Configuration (Optional):**
+
+- Requires SendGrid API key (free tier available)
+- Set `SENDGRID_API_KEY` and `EMAIL_USER` in .env
+- Sender email must be verified at https://app.sendgrid.com/settings/sender_auth
+- If not configured, email tool shows report preview instead
