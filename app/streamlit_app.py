@@ -12,7 +12,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from model.predict import predict_trend
 from rag.rag_chain import get_rag_chain
-from app.chatbot import get_stock_price, get_stock_info, get_stock_history
+from app.chatbot import get_stock_price, get_stock_info, get_stock_history, AGENT_TOOLS, process_query
+from app.market_summary import get_market_summary
 from agents.orchestrator import AgentOrchestrator
 from utils.volatility_analyzer import analyze_stock_volatility
 
@@ -239,59 +240,102 @@ if page == "Prediction":
         st.caption("⚠️ Not financial advice. For educational purposes only.")
 #Chat Bot
 elif page == "Chatbot":
-    st.header("Stock Analysis Chatbot")
-    st.write("Ask questions about stocks using natural language!")
+    st.header("🤖 AI Stock Analysis Chatbot")
+    st.write("Powered by Finnhub API - Get real-time news, earnings, and sentiment analysis!")
     
     # Quick action buttons
+    st.subheader("⚡ Quick Actions")
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("Get AAPL Price"):
-            st.info(get_stock_price("AAPL"))
+        if st.button("💰 AAPL Price"):
+            st.info(AGENT_TOOLS['price']("AAPL"))
+        if st.button("📰 AAPL News"):
+            st.info(AGENT_TOOLS['news']("AAPL"))
     
     with col2:
-        if st.button("Get MSFT Info"):
-            st.info(get_stock_info("MSFT"))
+        if st.button("🏢 MSFT Info"):
+            st.info(AGENT_TOOLS['info']("MSFT"))
+        if st.button("📅 MSFT Earnings"):
+            st.info(AGENT_TOOLS['earnings']("MSFT"))
     
     with col3:
-        if st.button("Get TSLA History"):
-            st.info(get_stock_history("TSLA"))
+        if st.button("📈 TSLA History"):
+            st.info(AGENT_TOOLS['history']("TSLA"))
+        if st.button("📊 TSLA Sentiment"):
+            st.info(AGENT_TOOLS['sentiment']("TSLA"))
+    
+    # Email tool button
+    st.markdown("---")
+    col_email1, col_email2 = st.columns([3, 1])
+    with col_email1:
+        email_input = st.text_input("📧 Email Address (for stock reports)", placeholder="your-email@example.com")
+    with col_email2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("📧 Send AAPL Report"):
+            if email_input:
+                import os
+                api_key = os.getenv('SENDGRID_API_KEY')
+                sender = os.getenv('EMAIL_USER')
+                result = AGENT_TOOLS['email']("AAPL", email_input, api_key, sender)
+                st.info(result)
+            else:
+                st.warning("Please enter an email address")
+    
+    st.divider()
     
     # Chat interface
-    st.subheader("Chat with Agent")
+    st.subheader("💬 Chat with AI Agent")
+    
+    # Example queries
+    with st.expander("💡 Example Queries"):
+        st.markdown("""
+        **Price & Info:**
+        - "What is the price of AAPL?"
+        - "Tell me about MSFT"
+        
+        **News & Sentiment:**
+        - "Show me news for TSLA"
+        - "Analyze sentiment for GOOGL"
+        
+        **Earnings & History:**
+        - "When is NVDA earnings?"
+        - "Show me AMZN history"
+        
+        **Email Reports:**
+        - "Send AAPL report to user@example.com"
+        - "Email MSFT summary to investor@company.com"
+        """)
     
     if "messages" not in st.session_state:
         st.session_state.messages = []
     
+    # Display chat history
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
-            st.write(message["content"])
+            st.markdown(message["content"])
     
-    user_input = st.chat_input("Ask about stocks (e.g., 'What is the price of AAPL?')")
+    # Chat input
+    user_input = st.chat_input("Ask about any stock (e.g., 'What is the price of AAPL?')")
     
     if user_input:
+        # Add user message
         st.session_state.messages.append({"role": "user", "content": user_input})
         
         with st.chat_message("user"):
-            st.write(user_input)
+            st.markdown(user_input)
         
+        # Process query with agent
         with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                # Use tools directly for simple queries
-                if "price" in user_input.lower():
-                    ticker = user_input.upper().split()[-1].replace("?", "")
-                    response = get_stock_price(ticker)
-                elif "info" in user_input.lower() or "about" in user_input.lower():
-                    ticker = user_input.upper().split()[-1].replace("?", "")
-                    response = get_stock_info(ticker)
-                elif "history" in user_input.lower():
-                    ticker = user_input.upper().split()[-1].replace("?", "")
-                    response = get_stock_history(ticker)
-                else:
-                    response = "I can help you with stock prices, info, and history. Try asking: 'What is the price of AAPL?'"
-                
-                st.write(response)
+            with st.spinner("🔍 Analyzing..."):
+                response = process_query(user_input)
+                st.markdown(response)
                 st.session_state.messages.append({"role": "assistant", "content": response})
+    
+    # Clear chat button
+    if st.button("🗑️ Clear Chat History"):
+        st.session_state.messages = []
+        st.rerun()
 
 # ============================================================================
 # VOLATILITY ANALYSIS PAGE
@@ -311,3 +355,30 @@ elif page == "Volatility Analysis":
             except Exception as e:
                 st.error(f"❌ Error analyzing {ticker_input}: {str(e)}")
                 st.info("Please verify the ticker symbol and try again.")
+# Sidebar with market summary
+with st.sidebar:
+    st.header("📊 Market Overview")
+    
+    try:
+        market_data = get_market_summary()
+        
+        if market_data:
+            st.caption("Top Stocks (Live)")
+            
+            for stock in market_data:
+                ticker = stock['ticker']
+                price = stock['price']
+                change_pct = stock['change_pct']
+                
+                if change_pct > 0:
+                    st.markdown(f"**{ticker}** ${price:.2f} :green[↑ {change_pct:+.2f}%]")
+                elif change_pct < 0:
+                    st.markdown(f"**{ticker}** ${price:.2f} :red[↓ {change_pct:+.2f}%]")
+                else:
+                    st.markdown(f"**{ticker}** ${price:.2f} :gray[→ {change_pct:.2f}%]")
+            
+            st.caption("🔄 Updates every 5 min")
+        else:
+            st.info("Market data unavailable")
+    except:
+        st.caption("⚠️ Market data unavailable")

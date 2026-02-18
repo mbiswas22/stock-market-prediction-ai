@@ -13,9 +13,16 @@
   - News Ingestion Agent
   - Earnings & Event Awareness Agent
   - Sentiment + Indicator Explanation Agent
+- Two-column Streamlit UI (Prediction | News & Sentiment)
+- **Interactive AI Chatbot** with 6 agent tools:
+  - 💰 Real-time stock prices
+  - 🏢 Company information
+  - 📰 Latest news from Finnhub
+  - 📅 Earnings calendar
+  - 📊 Sentiment analysis
+  - 📈 Historical price data
 - Three-page Streamlit UI (Prediction | Volatility Analysis | Chatbot)
 - Explainable AI using RAG
-- Interactive chatbot with stock analysis tools
 - Free-tier friendly with smart caching
 
 ### Run Instructions
@@ -58,17 +65,19 @@ stock-market-prediction-ai/
 │   ├── sentiment_indicator_agent.py
 │   └── orchestrator.py
 ├── services/                    # External API clients
-│   └── finnhub_client.py
+│   └── finnhub_client.py        # Finnhub API integration
 ├── schemas/                     # Pydantic data models
 │   └── agent_schemas.py
 ├── app/
+│   ├── streamlit_app.py        # Two-page UI (Prediction | Chatbot)
+│   └── chatbot.py               # AI chatbot with 6 agent tools
 │   └── streamlit_app.py        # Three-page UI (Prediction | Volatility | Chatbot)
 ├── utils/
 │   ├── volatility_analyzer.py  # Realized volatility calculations
 │   └── tools.py
 ├── data/
 │   ├── fetch_data.py
-│   └── feature_engineering.py  # Now includes RSI & MACD
+│   └── feature_engineering.py  # Includes RSI & MACD
 ├── model/
 │   ├── train_model.py          # Handles 4-7 features
 │   ├── predict.py
@@ -81,13 +90,29 @@ stock-market-prediction-ai/
 
 ### Architecture
 
-**Left Window - Prediction & Technicals:**
+**Prediction Page - Stock Trend Analysis:**
 
 - Model prediction (UP/DOWN)
 - Confidence score
 - Technical indicators: MA20, MA50, Return, Volume, RSI, MACD
 - RSI visual indicators: 🐂 (>70), 🐻 (≤30)
 - Optional price chart
+- AI-powered insights with Finnhub integration
+
+**Chatbot Page - Interactive AI Assistant:**
+
+- 💬 Natural language query processing
+- 🤖 6 specialized agent tools:
+  - **Price Tool**: Real-time quotes with change %
+  - **Info Tool**: Company profile and market cap
+  - **News Tool**: Latest headlines from Finnhub API
+  - **Earnings Tool**: Earnings calendar and EPS data
+  - **Sentiment Tool**: AI-powered news sentiment analysis
+  - **History Tool**: 30-day price statistics
+- ⚡ Quick action buttons for common queries
+- 📝 Example queries and help
+- 💾 Chat history with session state
+- 🎯 Smart ticker extraction from natural language
 
 **Right Window - News & Sentiment Intelligence:**
 
@@ -138,3 +163,41 @@ stock-market-prediction-ai/
 - Generates markdown explanation
 - Inline citations from top headlines
 - Combines news + technicals + prediction
+
+### Chatbot Agent Tools
+
+**Tool 1 - Price Agent:**
+
+- Real-time stock quotes using yfinance
+- Shows current price with change % and dollar amount
+- Triggers on: "price", "cost", "trading", "quote", "worth"
+
+**Tool 2 - Info Agent:**
+
+- Company profile and basic information
+- Displays sector and market capitalization
+- Triggers on: "info", "about", "company", "profile", "what"
+
+**Tool 3 - News Agent:**
+
+- Latest company news from Finnhub API (7 days)
+- Shows top 3 headlines with sources
+- Triggers on: "news", "headlines", "articles", "latest"
+
+**Tool 4 - Earnings Agent:**
+
+- Earnings calendar from Finnhub API (±30 days)
+- EPS estimates and actual results
+- Triggers on: "earnings", "eps", "report"
+
+**Tool 5 - Sentiment Agent:**
+
+- AI-powered sentiment analysis from news
+- Analyzes positive/negative signals in headlines
+- Triggers on: "sentiment", "feeling", "mood", "opinion"
+
+**Tool 6 - History Agent:**
+
+- 30-day price statistics using yfinance
+- Shows high, low, and average prices
+- Triggers on: "history", "past", "trend", "stats"
