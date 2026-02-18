@@ -8,6 +8,7 @@
 ### Features
 
 - ML-based trend prediction with RSI & MACD indicators
+- **Realized Volatility Analysis** - 30/60/90 day rolling volatility trends with quantitative insights
 - 3-Agent Intelligence System:
   - News Ingestion Agent
   - Earnings & Event Awareness Agent
@@ -20,6 +21,7 @@
   - 📅 Earnings calendar
   - 📊 Sentiment analysis
   - 📈 Historical price data
+- Three-page Streamlit UI (Prediction | Volatility Analysis | Chatbot)
 - Explainable AI using RAG
 - Free-tier friendly with smart caching
 
@@ -69,6 +71,10 @@ stock-market-prediction-ai/
 ├── app/
 │   ├── streamlit_app.py        # Two-page UI (Prediction | Chatbot)
 │   └── chatbot.py               # AI chatbot with 6 agent tools
+│   └── streamlit_app.py        # Three-page UI (Prediction | Volatility | Chatbot)
+├── utils/
+│   ├── volatility_analyzer.py  # Realized volatility calculations
+│   └── tools.py
 ├── data/
 │   ├── fetch_data.py
 │   └── feature_engineering.py  # Includes RSI & MACD
@@ -108,6 +114,24 @@ stock-market-prediction-ai/
 - 💾 Chat history with session state
 - 🎯 Smart ticker extraction from natural language
 
+**Right Window - News & Sentiment Intelligence:**
+
+- Event Risk Level (LOW/MEDIUM/HIGH)
+- Sentiment Analysis (Positive/Neutral/Negative)
+- Top 3 headlines with clickable links
+- AI-generated explanation with citations
+
+**Volatility Analysis Page:**
+
+- 📊 30/60/90 day rolling realized volatility calculations
+- 📈 Time-series visualization of volatility trends
+- 🔍 Volatility trend interpretation (rising/falling)
+- 📉 Market regime assessment (expansion/compression/stable)
+- 🧮 Quantitative reasoning with percentile rankings
+- 💡 Probabilistic options-style insights
+- 📅 12-month historical analysis using free data (yfinance)
+- ⚡ Annualized volatility metrics (√252 scaling)
+
 ### Performance Optimizations
 
 - `@st.cache_data` for Finnhub API calls (15-min TTL)
@@ -143,31 +167,37 @@ stock-market-prediction-ai/
 ### Chatbot Agent Tools
 
 **Tool 1 - Price Agent:**
+
 - Real-time stock quotes using yfinance
 - Shows current price with change % and dollar amount
 - Triggers on: "price", "cost", "trading", "quote", "worth"
 
 **Tool 2 - Info Agent:**
+
 - Company profile and basic information
 - Displays sector and market capitalization
 - Triggers on: "info", "about", "company", "profile", "what"
 
 **Tool 3 - News Agent:**
+
 - Latest company news from Finnhub API (7 days)
 - Shows top 3 headlines with sources
 - Triggers on: "news", "headlines", "articles", "latest"
 
 **Tool 4 - Earnings Agent:**
+
 - Earnings calendar from Finnhub API (±30 days)
 - EPS estimates and actual results
 - Triggers on: "earnings", "eps", "report"
 
 **Tool 5 - Sentiment Agent:**
+
 - AI-powered sentiment analysis from news
 - Analyzes positive/negative signals in headlines
 - Triggers on: "sentiment", "feeling", "mood", "opinion"
 
 **Tool 6 - History Agent:**
+
 - 30-day price statistics using yfinance
 - Shows high, low, and average prices
 - Triggers on: "history", "past", "trend", "stats"

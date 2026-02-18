@@ -15,6 +15,7 @@ from rag.rag_chain import get_rag_chain
 from app.chatbot import get_stock_price, get_stock_info, get_stock_history, AGENT_TOOLS, process_query
 from app.market_summary import get_market_summary
 from agents.orchestrator import AgentOrchestrator
+from utils.volatility_analyzer import analyze_stock_volatility
 
 # Page config
 st.set_page_config(page_title="Stock Trend Predictor", layout="wide")
@@ -32,10 +33,39 @@ def run_intelligence_cached(ticker, prediction, indicators, confidence):
 
 st.title("📈 Stock Trend Predictor + AI Analyst")
 
-# Sidebar for navigation
-page = st.sidebar.radio("Navigation", ["Prediction", "Chatbot"])
+# # Sidebar for navigation
+# page = st.sidebar.radio("Navigation", ["Prediction", "Volatility Analysis", "Chatbot"])
 
-if page == "Prediction":
+# Create Tabs
+tab1, tab2, tab3 = st.tabs([
+    "📊 Volatility Analysis",
+    "📋 Prediction",
+    "🤖 Chatbot"
+])
+
+# ============================================================================
+# VOLATILITY ANALYSIS PAGE
+# ============================================================================
+# ------------------ TAB 1 ------------------
+with tab1:
+    st.header("📊 Realized Volatility Analysis")
+    st.write("Quantitative equity analysis: 30/60/90 day rolling realized volatility trends")
+    
+    ticker_input = st.text_input("Enter Stock Symbol", value="AAPL").upper()
+    
+    if st.button("🔍 Analyze Volatility", type="primary"):
+        with st.spinner(f"Analyzing {ticker_input} volatility patterns..."):
+            try:
+                fig, report = analyze_stock_volatility(ticker_input)
+                st.pyplot(fig)
+                st.markdown(report)
+            except Exception as e:
+                st.error(f"❌ Error analyzing {ticker_input}: {str(e)}")
+                st.info("Please verify the ticker symbol and try again.")
+
+# ------------------ TAB 2 ------------------
+with tab2:
+    st.subheader("Prediction Result")
 
     # Ticker selection
     ticker = st.selectbox("Select Stock", ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"])
@@ -95,12 +125,12 @@ if page == "Prediction":
         col1, col2 = st.columns(2)
         
         with col1:
-            st.metric("MA20", f"{ma20:.2f}")
-            st.metric("Return", f"{ret:.4f}")
+            st.metric("MA20", f"{ma20:.2f}", help="20-day moving average — average stock price over the past 20 trading days. Helps show short-term trend direction.")
+            st.metric("Return", f"{ret:.4f}", help="Recent price change percentage. Positive means the stock gained value, negative means it declined.")
         
         with col2:
-            st.metric("MA50", f"{ma50:.2f}")
-            st.metric("Volume", f"{vol:,.0f}")
+            st.metric("MA50", f"{ma50:.2f}", help="50-day moving average — average stock price over the past 50 trading days. Helps show medium-term trend direction.")
+            st.metric("Volume", f"{vol:,.0f}", help="Number of shares traded in the latest period. Higher volume can indicate stronger buying or selling interest.")
         
         # RSI indicator with emoji
         if "RSI" in df.columns:
@@ -112,12 +142,12 @@ if page == "Prediction":
             else:
                 rsi_indicator = "—"
             
-            st.metric("RSI", f"{rsi:.2f} {rsi_indicator}")
+            st.metric("RSI", f"{rsi:.2f} {rsi_indicator}", help="Relative Strength Index (0–100). Above 70 may indicate overbought conditions. Below 30 may indicate oversold conditions.")
         
         # MACD
         if "MACD" in df.columns:
             macd = latest["MACD"].values[0]
-            st.metric("MACD", f"{macd:.4f}")
+            st.metric("MACD", f"{macd:.4f}", help="Momentum indicator comparing two moving averages. Crossovers can suggest trend shifts.")
         
         # Optional: Line chart
         if st.checkbox("Show Price Chart"):
@@ -237,8 +267,9 @@ if page == "Prediction":
 
         st.divider()
         st.caption("⚠️ Not financial advice. For educational purposes only.")
-#Chat Bot
-elif page == "Chatbot":
+
+# ------------------ TAB 3 ------------------
+with tab3:
     st.header("🤖 AI Stock Analysis Chatbot")
     st.write("Powered by Finnhub API - Get real-time news, earnings, and sentiment analysis!")
     
