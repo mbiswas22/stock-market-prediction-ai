@@ -42,12 +42,15 @@ def add_features(df):
     return df
 
 if __name__ == "__main__":
-    df = pd.read_csv("data/raw_stock_data.csv")
+    tickers = ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"]
+    for ticker in tickers:
+        print(f"Processing {ticker}...")
+        df = pd.read_csv(f"data/{ticker}_raw.csv")
 
-    # Drop accidental index column if present
-    if "Unnamed: 0" in df.columns:
-        df.drop(columns=["Unnamed: 0"], inplace=True)
+        # Drop accidental index column if present
+        if "Unnamed: 0" in df.columns:
+            df.drop(columns=["Unnamed: 0"], inplace=True)
 
-    df = add_features(df)
-    df.to_csv("data/features.csv", index=False)
-    print("✅ Feature engineering complete")
+        df = add_features(df)
+        df.to_csv(f"data/{ticker}_features.csv", index=False)
+        print(f"✅ {ticker} feature engineering complete")
