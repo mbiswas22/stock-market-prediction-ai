@@ -8,11 +8,12 @@
 ### Features
 
 - ML-based trend prediction with RSI & MACD indicators
+- **Realized Volatility Analysis** - 30/60/90 day rolling volatility trends with quantitative insights
 - 3-Agent Intelligence System:
   - News Ingestion Agent
   - Earnings & Event Awareness Agent
   - Sentiment + Indicator Explanation Agent
-- Two-column Streamlit UI (Prediction | News & Sentiment)
+- Three-page Streamlit UI (Prediction | Volatility Analysis | Chatbot)
 - Explainable AI using RAG
 - Interactive chatbot with stock analysis tools
 - Free-tier friendly with smart caching
@@ -61,7 +62,10 @@ stock-market-prediction-ai/
 ├── schemas/                     # Pydantic data models
 │   └── agent_schemas.py
 ├── app/
-│   └── streamlit_app.py        # Two-column UI
+│   └── streamlit_app.py        # Three-page UI (Prediction | Volatility | Chatbot)
+├── utils/
+│   ├── volatility_analyzer.py  # Realized volatility calculations
+│   └── tools.py
 ├── data/
 │   ├── fetch_data.py
 │   └── feature_engineering.py  # Now includes RSI & MACD
@@ -91,6 +95,17 @@ stock-market-prediction-ai/
 - Sentiment Analysis (Positive/Neutral/Negative)
 - Top 3 headlines with clickable links
 - AI-generated explanation with citations
+
+**Volatility Analysis Page:**
+
+- 📊 30/60/90 day rolling realized volatility calculations
+- 📈 Time-series visualization of volatility trends
+- 🔍 Volatility trend interpretation (rising/falling)
+- 📉 Market regime assessment (expansion/compression/stable)
+- 🧮 Quantitative reasoning with percentile rankings
+- 💡 Probabilistic options-style insights
+- 📅 12-month historical analysis using free data (yfinance)
+- ⚡ Annualized volatility metrics (√252 scaling)
 
 ### Performance Optimizations
 

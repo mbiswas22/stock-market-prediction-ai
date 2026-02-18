@@ -37,18 +37,25 @@ streamlit run app/streamlit_app.py
    - 📅 Earnings & Event Agent (tracks risk levels)
    - 💭 Sentiment & Explanation Agent (analyzes & explains)
 
-2. **Enhanced UI**
-   - Two-column layout (Prediction | Intelligence)
+2. **Realized Volatility Analysis**
+   - 📊 30/60/90 day rolling volatility calculations
+   - 📈 Time-series visualization with trend analysis
+   - 🔍 Market regime assessment (expansion/compression)
+   - 💡 Probabilistic options-style insights
+   - 📅 12-month historical analysis
+
+3. **Enhanced UI**
+   - Three-page layout (Prediction | Volatility Analysis | Chatbot)
    - Professional design with badges and indicators
    - Clickable news headlines
    - Real-time sentiment analysis
 
-3. **Advanced Technical Indicators**
+4. **Advanced Technical Indicators**
    - RSI (Relative Strength Index) with 🐂/🐻 indicators
    - MACD (Moving Average Convergence Divergence)
    - MA20, MA50, Return, Volume
 
-4. **Smart Performance**
+5. **Smart Performance**
    - 15-minute caching for API results
    - Module-level model loading
    - Retry logic with exponential backoff

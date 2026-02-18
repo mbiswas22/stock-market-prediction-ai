@@ -80,6 +80,17 @@ The app will open in your browser at http://localhost:8501
    - Top 3 Headlines
    - AI Explanation
 
+**Volatility Analysis Page:**
+1. Navigate to "Volatility Analysis" in sidebar
+2. Enter stock symbol (e.g., AAPL)
+3. Click "🔍 Analyze Volatility"
+4. Review:
+   - 30/60/90 day realized volatility chart
+   - Volatility trend interpretation
+   - Market regime assessment
+   - Quantitative reasoning
+   - Options environment insight
+
 ### Understanding the Output
 
 **RSI Indicators:**
