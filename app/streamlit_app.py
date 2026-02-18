@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from model.predict import predict_trend
 from rag.rag_chain import get_rag_chain
 from app.chatbot import get_stock_price, get_stock_info, get_stock_history, AGENT_TOOLS, process_query
+from app.market_summary import get_market_summary
 from agents.orchestrator import AgentOrchestrator
 
 # Page config
@@ -263,6 +264,23 @@ elif page == "Chatbot":
         if st.button("📊 TSLA Sentiment"):
             st.info(AGENT_TOOLS['sentiment']("TSLA"))
     
+    # Email tool button
+    st.markdown("---")
+    col_email1, col_email2 = st.columns([3, 1])
+    with col_email1:
+        email_input = st.text_input("📧 Email Address (for stock reports)", placeholder="your-email@example.com")
+    with col_email2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("📧 Send AAPL Report"):
+            if email_input:
+                import os
+                api_key = os.getenv('SENDGRID_API_KEY')
+                sender = os.getenv('EMAIL_USER')
+                result = AGENT_TOOLS['email']("AAPL", email_input, api_key, sender)
+                st.info(result)
+            else:
+                st.warning("Please enter an email address")
+    
     st.divider()
     
     # Chat interface
@@ -282,6 +300,10 @@ elif page == "Chatbot":
         **Earnings & History:**
         - "When is NVDA earnings?"
         - "Show me AMZN history"
+        
+        **Email Reports:**
+        - "Send AAPL report to user@example.com"
+        - "Email MSFT summary to investor@company.com"
         """)
     
     if "messages" not in st.session_state:
@@ -313,3 +335,31 @@ elif page == "Chatbot":
     if st.button("🗑️ Clear Chat History"):
         st.session_state.messages = []
         st.rerun()
+
+# Sidebar with market summary
+with st.sidebar:
+    st.header("📊 Market Overview")
+    
+    try:
+        market_data = get_market_summary()
+        
+        if market_data:
+            st.caption("Top Stocks (Live)")
+            
+            for stock in market_data:
+                ticker = stock['ticker']
+                price = stock['price']
+                change_pct = stock['change_pct']
+                
+                if change_pct > 0:
+                    st.markdown(f"**{ticker}** ${price:.2f} :green[↑ {change_pct:+.2f}%]")
+                elif change_pct < 0:
+                    st.markdown(f"**{ticker}** ${price:.2f} :red[↓ {change_pct:+.2f}%]")
+                else:
+                    st.markdown(f"**{ticker}** ${price:.2f} :gray[→ {change_pct:.2f}%]")
+            
+            st.caption("🔄 Updates every 5 min")
+        else:
+            st.info("Market data unavailable")
+    except:
+        st.caption("⚠️ Market data unavailable")

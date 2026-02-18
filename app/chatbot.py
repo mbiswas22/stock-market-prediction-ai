@@ -2,6 +2,9 @@
 Enhanced chatbot tools using Finnhub API and yfinance
 """
 import yfinance as yf
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from datetime import datetime
 from services.finnhub_client import FinnhubClient
 
 # Initialize Finnhub client
@@ -120,6 +123,71 @@ def analyze_sentiment(ticker: str) -> str:
     except Exception as e:
         return f"Error analyzing sentiment: {str(e)}"
 
+def send_stock_report(ticker: str, recipient_email: str, api_key: str = None, sender_email: str = None) -> str:
+    """Generate and send stock summary report via email using SendGrid API"""
+    try:
+        # Generate comprehensive report
+        report_parts = []
+        report_parts.append(f"Stock Summary Report for {ticker}")
+        report_parts.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        report_parts.append("=" * 50)
+        report_parts.append("")
+        
+        # Gather data from all tools
+        report_parts.append("PRICE INFORMATION")
+        report_parts.append(get_stock_price(ticker))
+        report_parts.append("")
+        
+        report_parts.append("COMPANY INFORMATION")
+        report_parts.append(get_stock_info(ticker))
+        report_parts.append("")
+        
+        report_parts.append("30-DAY HISTORY")
+        report_parts.append(get_stock_history(ticker))
+        report_parts.append("")
+        
+        report_parts.append("SENTIMENT ANALYSIS")
+        report_parts.append(analyze_sentiment(ticker))
+        report_parts.append("")
+        
+        report_parts.append("LATEST NEWS")
+        report_parts.append(get_company_news(ticker))
+        report_parts.append("")
+        
+        report_parts.append("EARNINGS INFORMATION")
+        report_parts.append(get_earnings_info(ticker))
+        report_parts.append("")
+        
+        report_parts.append("=" * 50)
+        report_parts.append("⚠️ Not financial advice. For educational purposes only.")
+        
+        report_text = "\n".join(report_parts)
+        
+        # If no API key provided, return report preview
+        if not api_key or not sender_email:
+            return f"📧 Email Report Preview:\n\n{report_text}\n\n⚠️ To send emails, configure SENDGRID_API_KEY and EMAIL_USER in .env file"
+        
+        # Create and send email using SendGrid
+        message = Mail(
+            from_email=sender_email,
+            to_emails=recipient_email,
+            subject=f"Stock Report: {ticker} - {datetime.now().strftime('%Y-%m-%d')}",
+            plain_text_content=report_text
+        )
+        
+        sg = SendGridAPIClient(api_key)
+        response = sg.send(message)
+        
+        return f"✅ Stock report for {ticker} sent successfully to {recipient_email}!"
+    except Exception as e:
+        error_msg = str(e)
+        report_text = "\n".join(report_parts) if 'report_parts' in locals() else "Report generation failed"
+        
+        if "403" in error_msg or "Forbidden" in error_msg:
+            return f"❌ SendGrid Error: Sender email '{sender_email}' is not verified.\n\n📧 Report Preview:\n\n{report_text}\n\n⚠️ To send emails:\n1. Verify sender email at https://app.sendgrid.com/settings/sender_auth\n2. Or use Single Sender Verification\n3. Wait for verification email and confirm"
+        
+        return f"❌ Error: {error_msg}\n\n📧 Report Preview:\n\n{report_text}"
+
 # Agent tools mapping
 AGENT_TOOLS = {
     "price": get_stock_price,
@@ -127,7 +195,8 @@ AGENT_TOOLS = {
     "history": get_stock_history,
     "news": get_company_news,
     "earnings": get_earnings_info,
-    "sentiment": analyze_sentiment
+    "sentiment": analyze_sentiment,
+    "email": send_stock_report
 }
 
 def process_query(query: str) -> str:
@@ -170,7 +239,19 @@ def process_query(query: str) -> str:
         return "❓ Please specify a stock ticker (e.g., AAPL, MSFT, TSLA)"
     
     # Route to appropriate tool based on keywords
-    if any(word in query_lower for word in ['price', 'cost', 'trading', 'quote', 'worth']):
+    if any(word in query_lower for word in ['email', 'send', 'mail']):
+        # Extract email if present
+        import re
+        email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', query)
+        if email_match:
+            recipient = email_match.group(0)
+            import os
+            api_key = os.getenv('SENDGRID_API_KEY')
+            sender = os.getenv('EMAIL_USER')
+            return AGENT_TOOLS['email'](ticker, recipient, api_key, sender)
+        else:
+            return "❓ Please provide a recipient email address (e.g., 'Send AAPL report to user@example.com')"
+    elif any(word in query_lower for word in ['price', 'cost', 'trading', 'quote', 'worth']):
         return AGENT_TOOLS['price'](ticker)
     elif any(word in query_lower for word in ['news', 'headlines', 'articles', 'latest']):
         return AGENT_TOOLS['news'](ticker)
