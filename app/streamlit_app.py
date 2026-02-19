@@ -33,6 +33,16 @@ def run_intelligence_cached(ticker, prediction, indicators, confidence):
 
 st.title("📈 Stock Trend Predictor + AI Analyst")
 
+# Global ticker selection in sidebar
+with st.sidebar:
+    st.header("🎯 Stock Selection")
+    selected_ticker = st.selectbox(
+        "Select Stock",
+        ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"],
+        key="global_ticker"
+    )
+    st.divider()
+
 # Create Tabs
 tab1, tab2, tab3, tab4 = st.tabs([
     "📊 Dashboard",
@@ -47,8 +57,8 @@ tab1, tab2, tab3, tab4 = st.tabs([
 with tab1:
     st.header("📊 Stock Market Dashboard")
     
-    # Ticker selection
-    dash_ticker = st.selectbox("🎯 Select Stock for Dashboard", ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"], key="dash_ticker")
+    # Use global ticker selection
+    dash_ticker = selected_ticker
     
     # Load data
     try:
@@ -110,8 +120,11 @@ with tab1:
 with tab2:
     st.header("📊 Realized Volatility Analysis")
     st.write("Quantitative equity analysis: 30/60/90 day rolling realized volatility trends")
+
+     # Use global ticker selection
+    s_ticker = selected_ticker
     
-    ticker_input = st.text_input("Enter Stock Symbol", value="AAPL").upper()
+    ticker_input = st.text_input("Enter Stock Symbol", value=f"{s_ticker}").upper()
     
     if st.button("🔍 Analyze Volatility", type="primary"):
         with st.spinner(f"Analyzing {ticker_input} volatility patterns..."):
@@ -129,8 +142,8 @@ with tab2:
 with tab3:
     st.subheader("Prediction Result")
 
-    # Ticker selection
-    ticker = st.selectbox("Select Stock", ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"])
+    # Use global ticker selection
+    ticker = selected_ticker
 
     # Load features data for selected ticker
     try:
@@ -329,6 +342,9 @@ with tab3:
 with tab4:
     st.header("🤖 AI Stock Analysis Chatbot")
     st.write("Powered by Finnhub API - Get real-time news, earnings, and sentiment analysis!")
+
+     # Use global ticker selection
+    c_ticker = selected_ticker
     
     # Quick action buttons
     st.subheader("⚡ Quick Actions")
@@ -359,12 +375,12 @@ with tab4:
         email_input = st.text_input("📧 Email Address (for stock reports)", placeholder="your-email@example.com")
     with col_email2:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("📧 Send AAPL Report"):
+        if st.button(f"📧 Send {c_ticker} Report"):
             if email_input:
                 import os
                 api_key = os.getenv('SENDGRID_API_KEY')
                 sender = os.getenv('EMAIL_USER')
-                result = AGENT_TOOLS['email']("AAPL", email_input, api_key, sender)
+                result = AGENT_TOOLS['email'](f"{c_ticker}", email_input, api_key, sender)
                 st.info(result)
             else:
                 st.warning("Please enter an email address")
@@ -433,21 +449,21 @@ with st.sidebar:
         
         if market_data:
             st.caption("Top Stocks (Live)")
-            
+                
             for stock in market_data:
                 ticker = stock['ticker']
                 price = stock['price']
                 change_pct = stock['change_pct']
-                
+                    
                 if change_pct > 0:
                     st.markdown(f"**{ticker}** ${price:.2f} :green[↑ {change_pct:+.2f}%]")
                 elif change_pct < 0:
                     st.markdown(f"**{ticker}** ${price:.2f} :red[↓ {change_pct:+.2f}%]")
                 else:
                     st.markdown(f"**{ticker}** ${price:.2f} :gray[→ {change_pct:.2f}%]")
-            
+                
             st.caption("🔄 Updates every 5 min")
         else:
             st.info("Market data unavailable")
-    except:
+    except Exception as e:
         st.caption("⚠️ Market data unavailable")
