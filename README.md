@@ -1,5 +1,9 @@
 ## Stock Trend Predictor + AI Analyst (Educational Project)
 
+### UI Screenshot
+
+<img width="1269" height="555" alt="image" src="https://github.com/user-attachments/assets/09c59f06-5518-4fc9-90d3-893be2d16dd1" />
+
 ### Requirements
 
 - Python 3.12 or later
@@ -49,13 +53,6 @@ python rag/build_vectorstore.py
 # 5. Run Streamlit app
 streamlit run app/streamlit_app.py
 ```
-
-⚠️ **Not financial advice. For educational purposes only.**
-
-### UI Screenshot
-
-<img width="2554" height="1201" alt="image" src="https://github.com/user-attachments/assets/923d57a2-34eb-4aa8-a311-4d18cba5631e" />
-
 ### Project Structure
 
 ```
@@ -244,3 +241,5 @@ stock-market-prediction-ai/
 - Set `SENDGRID_API_KEY` and `EMAIL_USER` in .env
 - Sender email must be verified at https://app.sendgrid.com/settings/sender_auth
 - If not configured, email tool shows report preview instead
+
+⚠️ **Not financial advice. For educational purposes only.**
