@@ -8,6 +8,15 @@
 
 - Python 3.12 or later
 - Finnhub API Key (free tier available at https://finnhub.io/)
+- Sendgrid API Key for sending email (Free for 2 months https://app.sendgrid.com/)
+- Create .env file and add API keys like below:
+  ``` bash
+    FINNHUB_API_KEY = "XXXXXX"
+    
+    # Email Configuration (for sending stock reports via SendGrid)
+    EMAIL_USER=XXXX@xxx.com
+    SENDGRID_API_KEY=xxxxxxxxxxxx
+  ```
 
 ### Features
 
