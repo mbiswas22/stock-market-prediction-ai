@@ -5,7 +5,7 @@ from joblib import dump
 
 tickers = ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"]
 for ticker in tickers:
- df = pd.read_csv("data/{ticker}_features.csv")
+ df = pd.read_csv(f"data/{ticker}_features.csv")
 
 # Base features
 feature_cols = ["MA20", "MA50", "Return", "Volume"]
