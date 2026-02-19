@@ -2,8 +2,10 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from joblib import dump
- 
-df = pd.read_csv("data/features.csv")
+
+tickers = ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"]
+for ticker in tickers:
+ df = pd.read_csv("data/{ticker}_features.csv")
 
 # Base features
 feature_cols = ["MA20", "MA50", "Return", "Volume"]
