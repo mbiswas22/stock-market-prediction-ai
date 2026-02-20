@@ -10,5 +10,6 @@ if __name__ == "__main__":
     for ticker in tickers:
         print(f"Fetching {ticker}...")
         df = fetch_stock_data(ticker)
-        df.to_csv(f"data/{ticker}_raw.csv")
+        df.reset_index(inplace=True)  # Convert Date index to column
+        df.to_csv(f"data/{ticker}_raw.csv", index=False)
         print(f"✅ {ticker} data saved")
