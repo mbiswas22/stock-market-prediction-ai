@@ -31,16 +31,51 @@ def run_intelligence_cached(ticker, prediction, indicators, confidence):
     orchestrator = get_orchestrator()
     return orchestrator.run_intelligence(ticker, prediction, indicators, confidence)
 
-st.title("📈 Stock Trend Predictor + AI Analyst")
+st.title("📈 TrendPulse AI")
 
 # Global ticker selection in sidebar
 with st.sidebar:
     st.header("🎯 Stock Selection")
     selected_ticker = st.selectbox(
         "Select Stock",
-        ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"],
+        ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN", "GE"],
         key="global_ticker"
     )
+    
+    # Display prediction for selected ticker
+    try:
+        pred_df = pd.read_csv(f"data/{selected_ticker}_features.csv")
+        pred_latest = pred_df.tail(1)
+        
+        # Determine features
+        pred_base_features = ["MA20", "MA50", "Return", "Volume"]
+        pred_optional_features = []
+        if "RSI" in pred_df.columns:
+            pred_optional_features.append("RSI")
+        if "MACD" in pred_df.columns:
+            pred_optional_features.append("MACD")
+        if "MACD_Hist" in pred_df.columns:
+            pred_optional_features.append("MACD_Hist")
+        
+        pred_all_features = pred_base_features + pred_optional_features
+        pred_latest_features = pred_latest[pred_all_features]
+        
+        # Get prediction
+        pred_trend, pred_confidence = predict_trend(pred_latest_features)
+        
+        st.divider()
+        st.subheader("🔮 Prediction")
+        
+        if pred_trend == "UP":
+            st.success(f"📈 **{pred_trend}**")
+        else:
+            st.error(f"📉 **{pred_trend}**")
+        
+        st.metric("Confidence", f"{pred_confidence}%")
+        
+    except Exception as e:
+        st.caption("⚠️ Prediction unavailable")
+    
     st.divider()
 
 # Create Tabs

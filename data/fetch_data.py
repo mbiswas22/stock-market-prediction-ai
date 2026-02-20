@@ -6,7 +6,7 @@ def fetch_stock_data(ticker="AAPL", period="5y"):
     return df
  
 if __name__ == "__main__":
-    tickers = ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"]
+    tickers = ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN", "GE"]
     for ticker in tickers:
         print(f"Fetching {ticker}...")
         df = fetch_stock_data(ticker)

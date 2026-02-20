@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from joblib import dump
 
-tickers = ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"]
+tickers = ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN", "GE"]
 for ticker in tickers:
  df = pd.read_csv(f"data/{ticker}_features.csv")
 
