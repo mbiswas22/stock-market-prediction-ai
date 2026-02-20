@@ -42,7 +42,7 @@ def add_features(df):
     return df
 
 if __name__ == "__main__":
-    tickers = ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN"]
+    tickers = ["AAPL", "MSFT", "TSLA", "GOOGL", "AMZN", "GE"]
     for ticker in tickers:
         print(f"Processing {ticker}...")
         df = pd.read_csv(f"data/{ticker}_raw.csv")

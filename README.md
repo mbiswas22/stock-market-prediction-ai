@@ -10,9 +10,9 @@
 - Finnhub API Key (free tier available at https://finnhub.io/)
 - Sendgrid API Key for sending email (Free for 2 months https://app.sendgrid.com/)
 - Create .env file and add API keys like below:
-  ``` bash
+  ```bash
     FINNHUB_API_KEY = "XXXXXX"
-    
+
     # Email Configuration (for sending stock reports via SendGrid)
     EMAIL_USER=XXXX@xxx.com
     SENDGRID_API_KEY=xxxxxxxxxxxx
@@ -62,6 +62,7 @@ python rag/build_vectorstore.py
 # 5. Run Streamlit app
 streamlit run app/streamlit_app.py
 ```
+
 ### Project Structure
 
 ```
@@ -100,7 +101,15 @@ stock-market-prediction-ai/
 
 ### Architecture
 
-**Dashboard Page - Visual Analytics:**
+**Sidebar - Global Controls:**
+
+- 🎯 Stock Selection dropdown (AAPL, MSFT, TSLA, GOOGL, AMZN)
+- 🔮 Real-time Prediction display (UP/DOWN with confidence %)
+- 📊 Market Overview with live prices and top 3 gainers
+- 📈 Top Movers pie chart visualization
+- Auto-updates when ticker selection changes
+
+**Dashboard Page - Visual Analytics:****
 
 - Ticker dropdown selector (AAPL, MSFT, TSLA, GOOGL, AMZN)
 - Key metrics display: Current Price, MA20, MA50, RSI
@@ -140,6 +149,8 @@ stock-market-prediction-ai/
 - Top 3 headlines with clickable links
 - AI-generated explanation with citations
 
+**Chatbot Page - Interactive AI Assistant:**
+
 - 💬 Natural language query processing
 - 🤖 7 specialized agent tools:
   - **Price Tool**: Real-time quotes with change %
@@ -154,15 +165,15 @@ stock-market-prediction-ai/
 - 💾 Chat history with session state
 - 🎯 Smart ticker extraction from natural language
 
-**Chatbot Page - Interactive AI Assistant:**
-
 ### Performance Optimizations
 
 - `@st.cache_data` for Finnhub API calls (15-min TTL)
-- Model loaded once at module level
+- `@st.cache_data` for Market Summary (5-min TTL)
+- Model loaded once at module level (predict.py)
 - No runtime FAISS rebuilding
 - Rule-based sentiment (no heavy NLP models)
 - Retry logic with exponential backoff
+- Sidebar prediction updates automatically with ticker selection
 
 ### Agent System Details
 
@@ -243,8 +254,20 @@ stock-market-prediction-ai/
 - `feature_engineering.py` processes each ticker independently
 - Streamlit app dynamically loads data based on dropdown selection
 - Supported tickers: AAPL, MSFT, TSLA, GOOGL, AMZN
+- Date column properly formatted for readable chart x-axis labels
 
-**Email Configuration (Optional):**
+**Prediction Flow:**
+
+1. User selects ticker from sidebar dropdown
+2. App loads `{ticker}_features.csv` file
+3. Extracts latest row with features: MA20, MA50, Return, Volume, RSI, MACD
+4. Calls `predict_trend()` from `model/predict.py`
+5. Model returns probability using RandomForestClassifier
+6. Converts to UP/DOWN trend with confidence percentage
+7. Displays in sidebar with color coding (green UP, red DOWN)
+8. Updates automatically when ticker changes
+
+**Email Configuration (Optional):****
 
 - Requires SendGrid API key (free tier available)
 - Set `SENDGRID_API_KEY` and `EMAIL_USER` in .env

@@ -13,6 +13,7 @@ finnhub = FinnhubClient()
 def get_stock_price(ticker: str) -> str:
     """Get current stock price using yfinance"""
     try:
+        print(f"DEBUG: Ticker={ticker}")
         stock = yf.Ticker(ticker)
         data = stock.history(period="1d")
         if not data.empty:
@@ -126,6 +127,7 @@ def analyze_sentiment(ticker: str) -> str:
 def send_stock_report(ticker: str, recipient_email: str, api_key: str = None, sender_email: str = None) -> str:
     """Generate and send stock summary report via email using SendGrid API"""
     try:
+        print(f"DEBUG: send_stock_report called with ticker={ticker}")
         # Generate comprehensive report
         report_parts = []
         report_parts.append(f"Stock Summary Report for {ticker}")
@@ -204,7 +206,7 @@ def process_query(query: str) -> str:
     query_lower = query.lower()
     
     # Common stock tickers to look for
-    common_tickers = ['AAPL', 'MSFT', 'TSLA', 'GOOGL', 'AMZN', 'NVDA', 'META', 'NFLX', 'AMD', 'INTC']
+    common_tickers = ['AAPL', 'MSFT', 'TSLA', 'GOOGL', 'AMZN', 'NVDA', 'META', 'NFLX', 'AMD', 'INTC', 'GE']
     
     # Extract ticker from query - improved logic
     ticker = None
@@ -213,6 +215,7 @@ def process_query(query: str) -> str:
     for common_ticker in common_tickers:
         if common_ticker.lower() in query_lower:
             ticker = common_ticker
+            print(f"1. DEBUG: common_ticker={ticker}")
             break
     
     # Method 2: Look for uppercase words (likely tickers)
@@ -223,6 +226,7 @@ def process_query(query: str) -> str:
             clean_word = word.strip('.,?!').upper()
             # Check if it's 1-5 letters and all alpha
             if 1 <= len(clean_word) <= 5 and clean_word.isalpha():
+                print(f"DEBUG: Look for uppercase words with ticker={ticker}")
                 ticker = clean_word
                 break
     
@@ -233,6 +237,7 @@ def process_query(query: str) -> str:
             clean_word = word.strip('.,?!')
             if 2 <= len(clean_word) <= 5 and clean_word.isalpha():
                 ticker = clean_word
+                print(f"DEBUG: Look for any short alphabetic word with ticker={ticker}")
                 break
     
     if not ticker:
