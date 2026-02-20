@@ -64,6 +64,20 @@ with tab1:
     try:
         dash_df = pd.read_csv(f"data/{dash_ticker}_features.csv")
         
+        # Check if Date column exists, otherwise use index
+        if 'Date' in dash_df.columns:
+            dash_df['Date'] = pd.to_datetime(dash_df['Date'])
+            dash_df.set_index('Date', inplace=True)
+        elif dash_df.index.name != 'Date':
+            # If no Date column, try to parse the first column or index
+            if pd.api.types.is_numeric_dtype(dash_df.index):
+                # Reset index and try to find date column
+                dash_df = dash_df.reset_index()
+                if 'index' in dash_df.columns:
+                    dash_df['Date'] = pd.to_datetime(dash_df['index'])
+                    dash_df.set_index('Date', inplace=True)
+                    dash_df.drop('index', axis=1, inplace=True, errors='ignore')
+        
         # Display key metrics
         st.subheader(f"{dash_ticker} Key Metrics")
         latest_dash = dash_df.tail(1)
