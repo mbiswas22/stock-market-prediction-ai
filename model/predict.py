@@ -12,6 +12,6 @@ def predict_trend(latest_row):
     Handles both old (4 features) and new (7 features) models.
     """
     prob = model.predict_proba(latest_row)[0][1]
-    trend = "UP 📈" if prob > 0.5 else "DOWN 📉"
+    trend = "UP" if prob > 0.5 else "DOWN"
     confidence = round(prob * 100, 2) if prob > 0.5 else round((1 - prob) * 100, 2)
     return trend, confidence
