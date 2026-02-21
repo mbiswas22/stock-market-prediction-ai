@@ -66,10 +66,10 @@ with st.sidebar:
         st.divider()
         st.subheader("🔮 Prediction")
         
-        if pred_trend == "UP":
-            st.success(f"📈 **{pred_trend}**")
+        if "UP" in pred_trend:
+            st.success(f"📈 **UP**")
         else:
-            st.error(f"📉 **{pred_trend}**")
+            st.error(f"📉 **DOWN**")
         
         st.metric("Confidence", f"{pred_confidence}%")
         
